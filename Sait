@@ -1,0 +1,539 @@
+<html><head><base href="." />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Sharing App</title>
+<style>
+:root {
+  --primary-color: #2196F3;
+  --primary-hover: #1976D2;
+  --background-dark: #121212;
+  --surface-dark: #1E1E1E;
+  --text-light: #ffffff;
+  --text-secondary: #B0B0B0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: var(--background-dark);
+  color: var(--text-light);
+}
+
+.header {
+  background: var(--surface-dark);
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.profile-menu {
+  position: absolute;
+  top: 60px;
+  right: 1rem;
+  background: var(--surface-dark);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  min-width: 200px;
+  z-index: 1001; /* Added higher z-index to appear above all other elements */
+}
+
+.profile-menu.active {
+  display: block;
+}
+
+.profile-menu h3 {
+  margin-bottom: 1rem;
+  color: var(--text-light);
+}
+
+.profile-info {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.profile-info p {
+  color: var(--text-secondary);
+  margin: 0.5rem 0;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  background: #d32f2f;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--surface-dark);
+  padding: 2rem;
+  border-radius: 16px;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  min-width: 320px;
+  text-align: center;
+}
+
+.modal.active {
+  display: block;
+}
+
+.modal input {
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--background-dark);
+  color: var(--text-light);
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.auth-buttons button {
+  flex: 1;
+  padding: 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  background: var(--primary-color);
+  color: var(--text-light);
+}
+
+.auth-buttons button:hover {
+  background: var(--primary-hover);
+}
+
+.profile-btn, .publish-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.profile-btn {
+  background: var(--surface-dark);
+  color: var(--text-light);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.publish-btn {
+  background: var(--primary-color);
+  color: var(--text-light);
+}
+
+.publish-btn:hover {
+  background: var(--primary-hover);
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.upload-form {
+  background: var(--surface-dark);
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  display: none;
+  position: relative;
+  z-index: 1; /* Ensure upload form stays below the profile menu */
+}
+
+.upload-form.active {
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  background: var(--background-dark);
+  color: var(--text-light);
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.video-card {
+  background: var(--surface-dark);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.video-preview {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+
+.video-info {
+  padding: 1rem;
+}
+
+.video-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-light);
+}
+
+.video-channel {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.video-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.progress {
+  margin-top: 1rem;
+  background: #444;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #2196f3;
+  width: 0%;
+  transition: width 0.4s;
+}
+
+video {
+  width: 100%;
+  border-radius: 8px;
+}
+</style>
+</head>
+<body>
+  <div class="modal active" id="user-modal">
+    <h3>Autenticação do Usuário</h3>
+    <input type="text" id="user-name" placeholder="Nome de usuário">
+    <input type="password" id="user-password" placeholder="Senha">
+    <div class="auth-buttons">
+      <button id="create-account">Criar Conta</button>
+      <button id="login">Entrar</button>
+    </div>
+  </div>
+
+  <header class="header">
+    <a href="https://example.com" class="logo">VideoShare</a>
+    <div class="nav-buttons">
+      <button class="publish-btn">Publicar</button>
+      <button class="profile-btn">?</button>
+    </div>
+  </header>
+
+  <div class="profile-menu" id="profile-menu">
+    <div class="profile-info">
+      <h3>Perfil do Usuário</h3>
+      <p id="profile-username">Usuário: </p>
+      <p id="profile-since">Membro desde: </p>
+    </div>
+    <button class="logout-btn">Sair da conta</button>
+  </div>
+
+  <main class="main-content">
+    <form class="upload-form">
+      <div class="form-group">
+        <label for="video-upload">Selecionar vídeo</label>
+        <input type="file" id="video-upload" accept="video/*">
+      </div>
+      <div class="form-group">
+        <label for="video-title">Título</label>
+        <input type="text" id="video-title" placeholder="Digite o título do vídeo">
+      </div>
+      <div class="form-group">
+        <label for="video-description">Descrição</label>
+        <textarea id="video-description" rows="4" placeholder="Digite a descrição do vídeo"></textarea>
+      </div>
+      <div class="progress">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <button type="submit" class="publish-btn">Publicar vídeo</button>
+    </form>
+
+    <div class="video-grid"></div>
+  </main>
+
+<script>
+const fakeServer = {
+  getAllVideos: () => JSON.parse(localStorage.getItem('globalVideos') || '[]'),
+  saveAllVideos: (videos) => localStorage.setItem('globalVideos', JSON.stringify(videos)),
+  uploadVideo: async (formData) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(formData.get('video'));
+      reader.onload = () => {
+        const videoUrl = reader.result;
+        const videos = fakeServer.getAllVideos();
+        videos.push({
+          videoUrl,
+          title: formData.get('title'),
+          description: formData.get('description'),
+          username: localStorage.getItem('currentUser'),
+          timestamp: new Date().toISOString()
+        });
+        fakeServer.saveAllVideos(videos);
+        resolve({ ok: true });
+      };
+    });
+  }
+};
+
+function updateProfileButton() {
+  const username = localStorage.getItem('currentUser');
+  const profileBtn = document.querySelector('.profile-btn');
+  if (username) {
+    profileBtn.textContent = username.charAt(0).toUpperCase();
+  } else {
+    profileBtn.textContent = '?';
+  }
+}
+
+function updateProfileMenu() {
+  const username = localStorage.getItem('currentUser');
+  if (username) {
+    const userData = JSON.parse(localStorage.getItem(username));
+    document.getElementById('profile-username').textContent = `Usuário: ${username}`;
+    document.getElementById('profile-since').textContent = `Membro desde: ${new Date(userData.createdAt).toLocaleDateString()}`;
+  }
+}
+
+function logout() {
+  localStorage.removeItem('currentUser');
+  document.getElementById('user-modal').classList.add('active');
+  document.getElementById('profile-menu').classList.remove('active');
+  updateProfileButton();
+}
+
+function saveUserData(username, password) {
+  const userData = {
+    username,
+    password,
+    createdAt: new Date().toISOString(),
+  };
+  localStorage.setItem(username, JSON.stringify(userData));
+}
+
+function loadUserData(username) {
+  return JSON.parse(localStorage.getItem(username) || null);
+}
+
+function isUsernameTaken(username) {
+  return localStorage.getItem(username) !== null;
+}
+
+async function publishVideo(videoFile, title, description, username) {
+  const formData = new FormData();
+  formData.append('video', videoFile);
+  formData.append('title', title);
+  formData.append('description', description);
+
+  const progressBar = document.getElementById('progress-bar');
+  progressBar.style.width = '50%';
+
+  try {
+    const response = await fakeServer.uploadVideo(formData);
+    if (response.ok) {
+      progressBar.style.width = '100%';
+      alert('Vídeo publicado com sucesso!');
+      loadAllVideos();
+    }
+  } catch (error) {
+    alert('Erro ao publicar vídeo.');
+    progressBar.style.width = '0%';
+  }
+}
+
+function loadAllVideos() {
+  const videos = fakeServer.getAllVideos();
+  const videoGrid = document.querySelector('.video-grid');
+  videoGrid.innerHTML = '';
+
+  videos.forEach((video) => {
+    const videoCard = document.createElement('div');
+    videoCard.className = 'video-card';
+    videoCard.innerHTML = `
+      <video src="${video.videoUrl}" controls></video>
+      <div class="video-info">
+        <h3 class="video-title">${video.title}</h3>
+        <p class="video-description">${video.description}</p>
+        <p class="video-channel">Postado por: ${video.username}</p>
+      </div>
+    `;
+    videoGrid.appendChild(videoCard);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('user-modal');
+  const createAccountBtn = document.getElementById('create-account');
+  const loginBtn = document.getElementById('login');
+  const publishBtn = document.querySelector('.publish-btn');
+  const videoUpload = document.getElementById('video-upload');
+  const uploadForm = document.querySelector('.upload-form');
+  const profileBtn = document.querySelector('.profile-btn');
+  const profileMenu = document.getElementById('profile-menu');
+  const logoutBtn = document.querySelector('.logout-btn');
+
+  profileBtn.addEventListener('click', () => {
+    if (localStorage.getItem('currentUser')) {
+      profileMenu.classList.toggle('active');
+      updateProfileMenu();
+    } else {
+      modal.classList.add('active');
+    }
+  });
+
+  logoutBtn.addEventListener('click', logout);
+
+  document.addEventListener('click', (e) => {
+    if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+      profileMenu.classList.remove('active');
+    }
+  });
+
+  updateProfileButton();
+
+  createAccountBtn.addEventListener('click', () => {
+    const username = document.getElementById('user-name').value.trim();
+    const password = document.getElementById('user-password').value;
+
+    if (isUsernameTaken(username)) {
+      alert('Nome de usuário já existe.');
+      return;
+    }
+
+    saveUserData(username, password);
+    localStorage.setItem('currentUser', username);
+    modal.classList.remove('active');
+    alert(`Conta criada com sucesso! Bem-vindo, ${username}!`);
+    updateProfileButton();
+    loadAllVideos();
+  });
+
+  loginBtn.addEventListener('click', () => {
+    const username = document.getElementById('user-name').value.trim();
+    const password = document.getElementById('user-password').value;
+
+    const userData = loadUserData(username);
+
+    if (userData && userData.password === password) {
+      localStorage.setItem('currentUser', username);
+      modal.classList.remove('active');
+      alert(`Bem-vindo de volta, ${username}!`);
+      updateProfileButton();
+      loadAllVideos();
+    } else {
+      alert('Usuário ou senha incorretos.');
+    }
+  });
+
+  publishBtn.addEventListener('click', () => {
+    if (!localStorage.getItem('currentUser')) {
+      alert('Faça login antes de publicar um vídeo.');
+      return;
+    }
+    uploadForm.classList.toggle('active');
+  });
+
+  uploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('video-title').value.trim();
+    const description = document.getElementById('video-description').value.trim();
+    const videoFile = videoUpload.files[0];
+    const username = localStorage.getItem('currentUser');
+
+    if (!videoFile || !title) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    await publishVideo(videoFile, title, description, username);
+    uploadForm.classList.remove('active');
+    uploadForm.reset();
+  });
+
+  loadAllVideos();
+});
+</script>
+</body>
+</html>
